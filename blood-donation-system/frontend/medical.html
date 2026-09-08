@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cán bộ y tế — Hệ thống Hiến máu</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand">Giọt Hồng<small>Cổng cán bộ y tế</small></div>
+    <div class="nav-item active" data-tab="diem-danh">Điểm danh &amp; tiếp nhận</div>
+    <div class="nav-item" data-tab="nguoi-hien">Tra cứu người hiến</div>
+    <div class="nav-item" data-tab="results">Kết quả hiến máu</div>
+    <div class="sidebar-footer">
+      <div class="who" id="whoName">—</div>
+      <div class="role-badge">Cán bộ y tế</div>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Đăng xuất</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <!-- ĐIỂM DANH -->
+    <section class="tab-panel active" id="panel-diem-danh">
+      <div class="page-header">
+        <div><h1>Điểm danh &amp; tiếp nhận máu</h1><p>Chỉ điểm danh được đối với đăng ký đã được Ban tổ chức phê duyệt.</p></div>
+      </div>
+      <div class="tabs">
+        <button class="ckFilterTab active" data-status="Đã chấp nhận">Đã duyệt — chờ điểm danh</button>
+        <button class="ckFilterTab" data-status="">Tất cả đăng ký</button>
+      </div>
+      <div id="regWrap"></div>
+    </section>
+
+    <!-- TRA CỨU NGƯỜI HIẾN -->
+    <section class="tab-panel" id="panel-nguoi-hien">
+      <div class="page-header">
+        <div><h1>Tra cứu người hiến máu</h1><p>Xem hồ sơ và lịch sử khai báo y tế.</p></div>
+        <input type="text" id="donorSearch" placeholder="Tìm theo mã, tên hoặc CCCD..." style="width:260px;">
+      </div>
+      <div id="donorTableWrap"></div>
+    </section>
+
+    <!-- KẾT QUẢ HIẾN MÁU -->
+<!-- KẾT QUẢ HIẾN MÁU -->
+    <section class="tab-panel" id="panel-results">
+      <div class="page-header">
+        <div>
+          <h1>Kết quả hiến máu</h1>
+          <p>Danh sách các ca hiến máu đã hoàn thành hoặc ghi nhận kết quả y tế.</p>
+        </div>
+        <input type="text" id="resultSearch" placeholder="Tìm theo mã ĐK, mã hoặc tên người hiến..." style="width:300px;">
+      </div>
+      <div id="resultTableWrap"></div>
+    </section>
+  </main>
+</div>
+
+<!-- Modal ghi nhận kết quả hiến máu -->
+<div class="modal-backdrop" id="resultModal">
+  <div class="modal">
+    <h3>Ghi nhận kết quả hiến máu</h3>
+    <p style="margin-bottom:1rem;">Đăng ký <b id="rs_ma_dang_ky_display"></b></p>
+    <div class="alert alert-error" id="resultAlert"></div>
+    <form id="resultForm" novalidate>
+      <input type="hidden" id="rs_ma_dang_ky">
+      <div class="field" data-field="trang_thai">
+        <label for="rs_trangthai">Trạng thái</label>
+        <select id="rs_trangthai">
+          <option value="Đã hoàn thành">Đã hoàn thành</option>
+          <option value="Chưa hoàn thành">Chưa hoàn thành</option>
+        </select>
+        <div class="error-text"></div>
+      </div>
+      <div class="field" data-field="luong_mau_ml" id="rs_luongmau_wrap">
+        <label for="rs_luongmau">Lượng máu tiếp nhận (ml)</label>
+        <select id="rs_luongmau">
+          <option value="250">250 ml</option>
+          <option value="350">350 ml</option>
+          <option value="450">450 ml</option>
+        </select>
+        <div class="error-text"></div>
+      </div>
+      <div class="field" data-field="ghi_chu_y_te">
+        <label for="rs_ghichu">Ghi chú y tế (nếu có)</label>
+        <textarea id="rs_ghichu"></textarea>
+        <div class="error-text"></div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="closeResultModal">Hủy</button>
+        <button type="submit" class="btn btn-primary">Lưu kết quả</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="assets/js/api.js"></script>
+<script src="assets/js/common.js"></script>
+<script src="assets/js/medical.js"></script>
+</body>
+</html>
