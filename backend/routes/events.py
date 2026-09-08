@@ -40,10 +40,6 @@ def list_events():
 
     trang_thai = request.args.get("trang_thai")
     events = Event.query.order_by(Event.thoi_gian_bat_dau.desc()).all()
-    changed = any(event.cap_nhat_trang_thai_theo_thoi_gian() for event in events)
-    if changed:
-        db.session.commit()
-
     events = [event for event in events if not trang_thai or event.trang_thai == trang_thai]
     return ok([e.to_dict(with_stats=True) for e in events])
 
@@ -55,8 +51,6 @@ def get_event(ma_su_kien):
     event = Event.query.filter_by(ma_su_kien=ma_su_kien).first()
     if not event:
         return fail("Không tìm thấy sự kiện.", 404)
-    if event.cap_nhat_trang_thai_theo_thoi_gian():
-        db.session.commit()
     return ok(event.to_dict(with_stats=True))
 
 
@@ -85,7 +79,6 @@ def update_event(ma_su_kien):
     event.thoi_gian_ket_thuc = ket_thuc
     event.chi_tieu_ml = int(merged["chi_tieu_ml"])
     event.trang_thai = merged["trang_thai"]
-    event.cap_nhat_trang_thai_theo_thoi_gian()
     db.session.commit()
     return ok(event.to_dict(with_stats=True), "Cập nhật sự kiện thành công.")
 
