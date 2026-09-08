@@ -15,6 +15,14 @@ def create_app():
     jwt.init_app(app)
     cors.init_app(app, resources={r"/api/*": {"origins": "*"}})
 
+    with app.app_context():
+        db.create_all()
+        try:
+            from seed import run_seed
+            run_seed()
+        except Exception as e:
+            pass
+
     from routes.auth import bp as auth_bp
     from routes.donors import bp as donors_bp
     from routes.medical import bp as medical_bp
