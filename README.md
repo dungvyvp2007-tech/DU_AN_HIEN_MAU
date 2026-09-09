@@ -56,16 +56,9 @@ python seed.py                  # tạo cơ sở dữ liệu + tài khoản mẫ
 python app.py                   # chạy server tại http://localhost:5000
 ```
 
-Mở trình duyệt tới `http://localhost:5000` — backend Flask phục vụ luôn cả frontend tĩnh trong thư mục `frontend/`.
+Mở trình duyệt tới `https://he-thong-hien-mau.onrender.com` — backend Flask phục vụ luôn cả frontend tĩnh trong thư mục `frontend/`.
 
-## Tài khoản tạo sẵn
 
-| Vai trò | Tên đăng nhập | Mật khẩu |
-|---|---|---|
-| Quản trị viên (QTV) | `admin` | `Admin@123` |
-| Cán bộ y tế mẫu (CBYT) | `canbo_yte1` | `CanBo@123` |
-
-> **Quan trọng**: đổi các mật khẩu này (qua `.env` trước khi seed, hoặc API `/api/auth/change-password` sau khi đăng nhập) trước khi triển khai thật. Tài khoản Người hiến máu (NHM) tự đăng ký tại trang "Đăng ký".
 
 ## Quy tắc nghiệp vụ đã được validate ở backend
 
