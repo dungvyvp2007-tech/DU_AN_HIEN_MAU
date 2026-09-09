@@ -1,5 +1,4 @@
-const user = requireRole("NHM");
-document.getElementById("whoName").textContent = user.username;
+requireRole("NHM");
 
 let donorState = null;
 let medDeclarations = [];

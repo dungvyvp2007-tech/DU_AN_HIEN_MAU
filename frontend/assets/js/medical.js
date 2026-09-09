@@ -1,5 +1,4 @@
-const user = requireRole("CBYT");
-document.getElementById("whoName").textContent = user.username;
+requireRole("CBYT");
 
 let currentCkFilter = "Đã chấp nhận";
 

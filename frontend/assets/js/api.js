@@ -1,13 +1,29 @@
 /* Lớp giao tiếp API dùng chung cho toàn bộ frontend. */
 const API_BASE = "https://he-thong-hien-mau.onrender.com/api";
 
+function toSessionUser(user) {
+  if (!user) return null;
+  return {
+    id: user.id,
+    role: user.role,
+    is_active: user.is_active,
+  };
+}
+
 const Session = {
   get token() { return localStorage.getItem("hienmau_token"); },
   set token(v) { v ? localStorage.setItem("hienmau_token", v) : localStorage.removeItem("hienmau_token"); },
   get user() {
-    try { return JSON.parse(localStorage.getItem("hienmau_user") || "null"); } catch { return null; }
+    try {
+      const user = toSessionUser(JSON.parse(localStorage.getItem("hienmau_user") || "null"));
+      if (user) localStorage.setItem("hienmau_user", JSON.stringify(user));
+      return user;
+    } catch { return null; }
   },
-  set user(v) { v ? localStorage.setItem("hienmau_user", JSON.stringify(v)) : localStorage.removeItem("hienmau_user"); },
+  set user(v) {
+    const user = toSessionUser(v);
+    user ? localStorage.setItem("hienmau_user", JSON.stringify(user)) : localStorage.removeItem("hienmau_user");
+  },
   clear() { this.token = null; this.user = null; },
 };
 

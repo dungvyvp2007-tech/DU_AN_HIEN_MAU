@@ -1,5 +1,4 @@
-const user = requireRole("QTV");
-document.getElementById("whoName").textContent = user.username;
+requireRole("QTV");
 
 let allEvents = [];
 let currentRegFilter = "Chờ duyệt";
