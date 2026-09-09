@@ -66,9 +66,7 @@ def login():
     if not username or not password:
         return fail("Vui lòng nhập tên đăng nhập và mật khẩu.", 400)
 
-    user = User.query.filter(
-        (User.username == username) | (User.email == username.lower())
-    ).first()
+    user = User.query.filter_by(username=username).first()
 
     if not user:
         return fail("Tên đăng nhập hoặc mật khẩu không đúng.", 401)

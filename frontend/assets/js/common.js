@@ -137,6 +137,7 @@ function ensureChangePasswordModal() {
         },
       });
       Session.clear();
+      alert("Đổi mật khẩu thành công.");
       location.replace("index.html");
     } catch (err) {
       alertBox.textContent = err.message;
