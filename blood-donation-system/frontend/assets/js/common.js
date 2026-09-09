@@ -76,3 +76,92 @@ function escapeHtml(str) {
   div.textContent = str ?? "";
   return div.innerHTML;
 }
+
+function ensureChangePasswordModal() {
+  if (document.getElementById("changePasswordModal")) return;
+
+  const modal = document.createElement("div");
+  modal.className = "modal-backdrop";
+  modal.id = "changePasswordModal";
+  modal.innerHTML = `
+    <div class="modal">
+      <h3>Đổi mật khẩu</h3>
+      <div class="alert alert-error" id="changePasswordAlert"></div>
+      <div class="alert alert-success" id="changePasswordSuccess"></div>
+      <form id="changePasswordForm" novalidate>
+        <div class="field" data-field="old_password">
+          <label for="oldPassword">Mật khẩu hiện tại</label>
+          <input type="password" id="oldPassword" autocomplete="current-password" required>
+          <div class="error-text"></div>
+        </div>
+        <div class="field" data-field="new_password">
+          <label for="newPassword">Mật khẩu mới</label>
+          <input type="password" id="newPassword" autocomplete="new-password" required>
+          <div class="hint">Tối thiểu 8 ký tự, có chữ và số.</div>
+          <div class="error-text"></div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="closeChangePassword">Hủy</button>
+          <button type="submit" class="btn btn-primary" style="width:auto;" id="changePasswordBtn">Lưu mật khẩu</button>
+        </div>
+      </form>
+    </div>`;
+  document.body.appendChild(modal);
+
+  const form = document.getElementById("changePasswordForm");
+  const alertBox = document.getElementById("changePasswordAlert");
+  const successBox = document.getElementById("changePasswordSuccess");
+  const button = document.getElementById("changePasswordBtn");
+  const close = () => {
+    modal.classList.remove("show");
+    form.reset();
+    clearFormErrors(form);
+    alertBox.classList.remove("show");
+    successBox.classList.remove("show");
+  };
+
+  document.getElementById("closeChangePassword").addEventListener("click", close);
+  modal.addEventListener("click", (event) => { if (event.target === modal) close(); });
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    clearFormErrors(form);
+    alertBox.classList.remove("show");
+    successBox.classList.remove("show");
+    button.disabled = true;
+    try {
+      await api("/auth/change-password", {
+        method: "POST",
+        body: {
+          old_password: document.getElementById("oldPassword").value,
+          new_password: document.getElementById("newPassword").value,
+        },
+      });
+      successBox.textContent = "Đổi mật khẩu thành công.";
+      successBox.classList.add("show");
+      setTimeout(close, 900);
+    } catch (err) {
+      alertBox.textContent = err.message;
+      alertBox.classList.add("show");
+      if (err.errors) showFormErrors(form, err.errors);
+    } finally {
+      button.disabled = false;
+    }
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const changePasswordButton = document.getElementById("changePasswordButton");
+  if (changePasswordButton) {
+    ensureChangePasswordModal();
+    changePasswordButton.addEventListener("click", () => {
+      document.getElementById("changePasswordModal").classList.add("show");
+      document.getElementById("oldPassword").focus();
+    });
+  }
+
+  if (Session.token) {
+    api("/auth/me").then((data) => {
+      if (data.user) Session.user = data.user;
+    }).catch(() => {});
+  }
+});
