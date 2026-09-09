@@ -136,9 +136,10 @@ function ensureChangePasswordModal() {
           new_password: document.getElementById("newPassword").value,
         },
       });
+      successBox.textContent = "Đổi mật khẩu thành công.";
+      successBox.classList.add("show");
       Session.clear();
-      alert("Đổi mật khẩu thành công.");
-      location.replace("index.html");
+      setTimeout(() => location.replace("index.html"), 1200);
     } catch (err) {
       alertBox.textContent = err.message;
       alertBox.classList.add("show");
