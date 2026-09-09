@@ -14,8 +14,8 @@ class Config:
     # --- Bảo mật ---
     # Trong môi trường thật, PHẢI đặt biến môi trường SECRET_KEY / JWT_SECRET_KEY
     # riêng, không dùng giá trị mặc định bên dưới.
-    SECRET_KEY = os.environ.get("SECRET_KEY", "doi-chuoi-bi-mat-nay-truoc-khi-trien-khai-that")
-    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "doi-chuoi-jwt-bi-mat-nay-truoc-khi-trien-khai-that")
+    SECRET_KEY = os.environ.get("SECRET_KEY", "gdfgdgdfhdhdhdhdgfgdgdfgdgdfgdgđhghfhfgstgr")
+    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "qRrưergdsfg45gtdfgdhfgj")
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=8)
     JWT_TOKEN_LOCATION = ["headers"]
 
