@@ -215,6 +215,7 @@ textarea { resize: vertical; min-height: 80px; }
 
 .btn-primary { background: var(--crimson); color: #fff; width: 100%; }
 .btn-primary:hover:not(:disabled) { background: var(--crimson-dark); }
+.btn-primary:disabled { background: #a6abb3; color: #f7f7f7; opacity: 0.7; }
 
 .btn-ghost { background: transparent; color: var(--ink); border-color: var(--line); }
 .btn-ghost:hover:not(:disabled) { border-color: var(--ink); }
@@ -225,6 +226,7 @@ textarea { resize: vertical; min-height: 80px; }
 .pagination { display:flex; justify-content:space-between; align-items:center; gap:1rem; padding-top:1rem; }
 .pagination > div { display:flex; gap:0.35rem; flex-wrap:wrap; justify-content:flex-end; }
 .pagination .active { background:var(--crimson); color:#fff; }
+.pagination-arrow { min-width:2.25rem; font-size:1.1rem; line-height:1; }
 
 .form-footnote { margin-top: 1.4rem; font-size: 0.87rem; color: var(--muted); text-align: center; }
 

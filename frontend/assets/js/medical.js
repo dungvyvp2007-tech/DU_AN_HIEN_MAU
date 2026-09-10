@@ -1,6 +1,7 @@
 requireRole("CBYT");
 
 let currentCkFilter = "Đã chấp nhận";
+let registrationPage = 1;
 
 document.querySelectorAll(".nav-item[data-tab]").forEach((item) => {
   item.addEventListener("click", () => switchTab(item.dataset.tab));
@@ -18,6 +19,7 @@ document.querySelectorAll(".ckFilterTab").forEach((btn) => {
     document.querySelectorAll(".ckFilterTab").forEach((b) => b.classList.remove("active"));
     btn.classList.add("active");
     currentCkFilter = btn.dataset.status;
+    registrationPage = 1;
     loadRegistrations();
   });
 });
@@ -27,11 +29,13 @@ async function loadRegistrations() {
   try {
     const path = currentCkFilter ? `/registrations?trang_thai=${encodeURIComponent(currentCkFilter)}` : "/registrations";
     const regs = await api(path);
+    const paged = paginateList(regs, registrationPage);
+    registrationPage = paged.page;
     wrap.innerHTML = regs.length
       ? `<div class="card"><table><thead><tr>
           <th>Mã đăng ký</th><th>Người hiến</th><th>Nhóm máu</th><th>Sự kiện</th><th>Trạng thái đăng ký</th><th>Điểm danh</th><th>Thao tác</th>
         </tr></thead><tbody>
-        ${regs.map((r) => `<tr>
+        ${paged.items.map((r) => `<tr>
           <td><b>${r.ma_dang_ky}</b></td>
           <td>${escapeHtml(r.nguoi_hien ? r.nguoi_hien.ho_ten : "—")}<div class="hint" style="color:var(--muted);font-size:0.78rem;">${r.nguoi_hien ? r.nguoi_hien.ma_nguoi_hien : ""}</div></td>
           <td>${r.nguoi_hien ? r.nguoi_hien.nhom_mau || "—" : "—"}</td>
@@ -40,11 +44,17 @@ async function loadRegistrations() {
           <td><span class="badge ${r.da_diem_danh ? 'badge-success' : 'badge-warning'}">${r.da_diem_danh ? "Đã điểm danh" : "Chưa điểm danh"}</span></td>
           <td>${actionCell(r)}</td>
         </tr>`).join("")}
-        </tbody></table></div>`
+        </tbody></table>${renderPagination(paged.page, paged.pages, paged.total)}</div>`
       : `<div class="empty-state">Không có đăng ký nào phù hợp.</div>`;
 
     wrap.querySelectorAll("button[data-checkin]").forEach((b) => b.addEventListener("click", () => doCheckin(b.dataset.checkin, b)));
     wrap.querySelectorAll("button[data-result]").forEach((b) => b.addEventListener("click", () => openResultModal(b.dataset.result)));
+    wrap.querySelectorAll("button[data-page]").forEach((button) => {
+      button.addEventListener("click", () => {
+        registrationPage = Number(button.dataset.page);
+        loadRegistrations();
+      });
+    });
   } catch (err) {
     wrap.innerHTML = `<div class="empty-state">${escapeHtml(err.message)}</div>`;
   }

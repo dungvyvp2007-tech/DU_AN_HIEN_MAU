@@ -2,6 +2,10 @@ requireRole("QTV");
 
 let allEvents = [];
 let currentRegFilter = "Chờ duyệt";
+let eventPage = 1;
+let registrationPage = 1;
+let reportPage = 1;
+let pendingPage = 1;
 
 document.querySelectorAll(".nav-item[data-tab]").forEach((item) => {
   item.addEventListener("click", () => switchTab(item.dataset.tab));
@@ -41,9 +45,17 @@ async function loadOverview() {
   try {
     const pending = await api("/registrations?trang_thai=Chờ duyệt");
     document.getElementById("pendingCount").textContent = pending.length;
+    const paged = paginateList(pending, pendingPage);
+    pendingPage = paged.page;
     document.getElementById("overviewPending").innerHTML = pending.length
-      ? renderRegTable(pending.slice(0, 6), false)
+      ? `${renderRegTable(paged.items, false)}${renderPagination(paged.page, paged.pages, paged.total)}`
       : `<div class="empty-state">Không có đơn nào đang chờ duyệt.</div>`;
+    document.querySelectorAll("#overviewPending button[data-page]").forEach((button) => {
+      button.addEventListener("click", () => {
+        pendingPage = Number(button.dataset.page);
+        loadOverview();
+      });
+    });
   } catch (err) { toast(err.message, "error"); }
 }
 
@@ -56,10 +68,12 @@ async function loadEvents() {
       wrap.innerHTML = `<div class="empty-state">Chưa có sự kiện nào. Hãy tạo sự kiện đầu tiên.</div>`;
       return;
     }
+    const paged = paginateList(allEvents, eventPage);
+    eventPage = paged.page;
     wrap.innerHTML = `<div class="card"><table><thead><tr>
         <th>Mã</th><th>Tên sự kiện</th><th>Thời gian</th><th>Chỉ tiêu</th><th>Đã thu</th><th>Tỷ lệ</th><th>Trạng thái</th><th></th>
       </tr></thead><tbody>
-      ${allEvents.map((ev) => `<tr>
+      ${paged.items.map((ev) => `<tr>
         <td>${ev.ma_su_kien}</td>
         <td>${escapeHtml(ev.ten_su_kien)}<div class="hint" style="color:var(--muted);font-size:0.78rem;">${escapeHtml(ev.dia_diem)}</div></td>
         <td>${fmtDateTime(ev.thoi_gian_bat_dau)}<br>→ ${fmtDateTime(ev.thoi_gian_ket_thuc)}</td>
@@ -72,13 +86,19 @@ async function loadEvents() {
           <button class="btn btn-danger btn-sm" data-delete-event="${ev.ma_su_kien}">Xóa</button>
         </td>
       </tr>`).join("")}
-      </tbody></table></div>`;
+      </tbody></table>${renderPagination(paged.page, paged.pages, paged.total)}</div>`;
 
     wrap.querySelectorAll("button[data-edit]").forEach((b) => {
       b.addEventListener("click", () => openEventModal(b.dataset.edit));
     });
     wrap.querySelectorAll("button[data-delete-event]").forEach((b) => {
       b.addEventListener("click", () => openEventDeleteModal(b.dataset.deleteEvent));
+    });
+    wrap.querySelectorAll("button[data-page]").forEach((button) => {
+      button.addEventListener("click", () => {
+        eventPage = Number(button.dataset.page);
+        loadEvents();
+      });
     });
   } catch (err) {
     wrap.innerHTML = `<div class="empty-state">${escapeHtml(err.message)}</div>`;
@@ -190,6 +210,7 @@ document.querySelectorAll(".regFilterTab").forEach((btn) => {
     document.querySelectorAll(".regFilterTab").forEach((b) => b.classList.remove("active"));
     btn.classList.add("active");
     currentRegFilter = btn.dataset.status;
+    registrationPage = 1;
     loadRegistrations();
   });
 });
@@ -220,8 +241,10 @@ async function loadRegistrations() {
   try {
     const path = currentRegFilter ? `/registrations?trang_thai=${encodeURIComponent(currentRegFilter)}` : "/registrations";
     const regs = await api(path);
+    const paged = paginateList(regs, registrationPage);
+    registrationPage = paged.page;
     wrap.innerHTML = regs.length
-      ? `<div class="card">${renderRegTable(regs)}</div>`
+      ? `<div class="card">${renderRegTable(paged.items)}${renderPagination(paged.page, paged.pages, paged.total)}</div>`
       : `<div class="empty-state">Không có đơn đăng ký nào.</div>`;
 
     wrap.querySelectorAll("button[data-approve]").forEach((b) => {
@@ -232,6 +255,12 @@ async function loadRegistrations() {
     });
     wrap.querySelectorAll("button[data-delete]").forEach((b) => {
       b.addEventListener("click", () => deleteRegistration(b.dataset.delete, b));
+    });
+    wrap.querySelectorAll("button[data-page]").forEach((button) => {
+      button.addEventListener("click", () => {
+        registrationPage = Number(button.dataset.page);
+        loadRegistrations();
+      });
     });
   } catch (err) {
     wrap.innerHTML = `<div class="empty-state">${escapeHtml(err.message)}</div>`;
@@ -322,11 +351,13 @@ async function loadReports() {
   const wrap = document.getElementById("reportWrap");
   try {
     const data = await api("/reports/tong-hop");
+    const paged = paginateList(data, reportPage);
+    reportPage = paged.page;
     wrap.innerHTML = data.length
       ? `<div class="card"><table><thead><tr>
           <th>Sự kiện</th><th>Trạng thái</th><th>Chỉ tiêu</th><th>Đã thu</th><th>Tỷ lệ hoàn thành</th>
         </tr></thead><tbody>
-        ${data.map((r) => `<tr>
+        ${paged.items.map((r) => `<tr>
           <td>${escapeHtml(r.ten_su_kien)}</td>
           <td>${badge(r.trang_thai)}</td>
           <td>${r.chi_tieu_ml.toLocaleString("vi-VN")} ml</td>
@@ -336,8 +367,14 @@ async function loadReports() {
             <span class="hint" style="color:var(--muted);">${r.ty_le_hoan_thanh}%</span>
           </td>
         </tr>`).join("")}
-        </tbody></table></div>`
+        </tbody></table>${renderPagination(paged.page, paged.pages, paged.total)}</div>`
       : `<div class="empty-state">Chưa có dữ liệu báo cáo.</div>`;
+    wrap.querySelectorAll("button[data-page]").forEach((button) => {
+      button.addEventListener("click", () => {
+        reportPage = Number(button.dataset.page);
+        loadReports();
+      });
+    });
   } catch (err) {
     wrap.innerHTML = `<div class="empty-state">${escapeHtml(err.message)}</div>`;
   }

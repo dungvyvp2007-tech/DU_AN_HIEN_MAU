@@ -3,6 +3,10 @@ requireRole("NHM");
 let donorState = null;
 let medDeclarations = [];
 let myRegs = [];
+let medPage = 1;
+let eventPage = 1;
+let myRegPage = 1;
+let overviewRegPage = 1;
 
 // ---------------------------------------------------------------- Tabs
 document.querySelectorAll(".nav-item[data-tab]").forEach((item) => {
@@ -66,10 +70,17 @@ function renderOverview() {
     <div class="stat-card"><div class="label">Đã chấp nhận</div><div class="value">${soDaChapNhan}</div></div>
   `;
 
-  const recent = myRegs.slice(0, 5);
-  document.getElementById("overviewRegistrations").innerHTML = recent.length
-    ? renderRegTable(recent)
+  const recent = paginateList(myRegs, overviewRegPage);
+  overviewRegPage = recent.page;
+  document.getElementById("overviewRegistrations").innerHTML = myRegs.length
+    ? `${renderRegTable(recent.items)}${renderPagination(recent.page, recent.pages, recent.total)}`
     : `<div class="empty-state">Bạn chưa có đăng ký nào. Hãy khai báo y tế rồi chọn một sự kiện để tham gia.</div>`;
+  document.querySelectorAll("#overviewRegistrations button[data-page]").forEach((button) => {
+    button.addEventListener("click", () => {
+      overviewRegPage = Number(button.dataset.page);
+      renderOverview();
+    });
+  });
 }
 
 // ---------------------------------------------------------------- Hồ sơ
@@ -150,16 +161,24 @@ function renderMedHistory() {
     box.innerHTML = `<div class="empty-state">Chưa có bản khai báo y tế nào.</div>`;
     return;
   }
+  const paged = paginateList(medDeclarations, medPage);
+  medPage = paged.page;
   box.innerHTML = `<table><thead><tr>
       <th>Ngày khai báo</th><th>Chiều cao</th><th>Cân nặng</th><th>Đã hiến trong 12 tuần</th>
     </tr></thead><tbody>
-    ${medDeclarations.map((d) => `<tr>
+    ${paged.items.map((d) => `<tr>
       <td>${fmtDateTime(d.created_at)}</td>
       <td>${d.chieu_cao_cm} cm</td>
       <td>${d.can_nang_kg} kg</td>
       <td>${d.da_hien_12_tuan ? "Có" : "Chưa"}</td>
     </tr>`).join("")}
-    </tbody></table>`;
+    </tbody></table>${renderPagination(paged.page, paged.pages, paged.total)}`;
+  box.querySelectorAll("button[data-page]").forEach((button) => {
+    button.addEventListener("click", () => {
+      medPage = Number(button.dataset.page);
+      renderMedHistory();
+    });
+  });
 }
 
 // ---------------------------------------------------------------- Sự kiện
@@ -172,9 +191,14 @@ async function loadEvents() {
       return;
     }
     const registeredEventIds = new Set(myRegs.map((r) => r.event_id));
-    box.innerHTML = events.map((ev) => {
+    const paged = paginateList(events, eventPage);
+    eventPage = paged.page;
+    box.innerHTML = paged.items.map((ev) => {
       const daDangKy = registeredEventIds.has(ev.id);
-      const coTheDangKy = ev.dang_nhan_dang_ky && !daDangKy;
+      const coTheDangKy = ev.dang_nhan_dang_ky
+        && ev.trang_thai !== "Đã kết thúc"
+        && ev.trang_thai !== "Đã hủy"
+        && !daDangKy;
       return `<div class="card">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;">
           <div>
@@ -187,15 +211,22 @@ async function loadEvents() {
             <div style="margin-top:0.6rem;">
               ${daDangKy
                 ? `<span class="badge badge-accepted">Đã đăng ký</span>`
-                : `<button class="btn btn-primary btn-sm" ${coTheDangKy ? "" : "disabled"} data-event="${ev.ma_su_kien}">Đăng ký tham gia</button>`}
+                : `<button class="btn btn-primary btn-sm" ${coTheDangKy ? "" : "disabled"} title="${coTheDangKy ? "Đăng ký tham gia" : "Sự kiện đã đóng đăng ký"}" data-event="${ev.ma_su_kien}">Đăng ký tham gia</button>`}
             </div>
           </div>
         </div>
       </div>`;
     }).join("");
+    box.insertAdjacentHTML("beforeend", renderPagination(paged.page, paged.pages, paged.total));
 
     box.querySelectorAll("button[data-event]").forEach((b) => {
       b.addEventListener("click", () => registerForEvent(b.dataset.event, b));
+    });
+    box.querySelectorAll("button[data-page]").forEach((button) => {
+      button.addEventListener("click", () => {
+        eventPage = Number(button.dataset.page);
+        loadEvents();
+      });
     });
   } catch (err) {
     box.innerHTML = `<div class="empty-state">${escapeHtml(err.message)}</div>`;
@@ -236,9 +267,17 @@ function renderRegTable(list) {
 
 function renderMyRegistrations() {
   const box = document.getElementById("myRegistrations");
+  const paged = paginateList(myRegs, myRegPage);
+  myRegPage = paged.page;
   box.innerHTML = myRegs.length
-    ? renderRegTable(myRegs)
+    ? `${renderRegTable(paged.items)}${renderPagination(paged.page, paged.pages, paged.total)}`
     : `<div class="empty-state">Bạn chưa có đăng ký nào.</div>`;
+  box.querySelectorAll("button[data-page]").forEach((button) => {
+    button.addEventListener("click", () => {
+      myRegPage = Number(button.dataset.page);
+      renderMyRegistrations();
+    });
+  });
 }
 
 loadAll();
