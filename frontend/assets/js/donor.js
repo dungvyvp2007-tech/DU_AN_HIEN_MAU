@@ -195,10 +195,8 @@ async function loadEvents() {
     eventPage = paged.page;
     box.innerHTML = paged.items.map((ev) => {
       const daDangKy = registeredEventIds.has(ev.id);
-      const coTheDangKy = ev.dang_nhan_dang_ky
-        && ev.trang_thai !== "Đã kết thúc"
-        && ev.trang_thai !== "Đã hủy"
-        && !daDangKy;
+      const trangThaiMoDangKy = ev.trang_thai === "Sắp diễn ra" || ev.trang_thai === "Đang diễn ra";
+      const coTheDangKy = ev.dang_nhan_dang_ky && trangThaiMoDangKy && !daDangKy;
       return `<div class="card">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;">
           <div>

@@ -80,7 +80,7 @@ function renderPagination(page, pages, total) {
 }
 
 function paginateList(list, page) {
-  const perPage = 5;
+  const perPage = 3;
   const pages = Math.max(Math.ceil(list.length / perPage), 1);
   const currentPage = Math.min(Math.max(page, 1), pages);
   const start = (currentPage - 1) * perPage;
