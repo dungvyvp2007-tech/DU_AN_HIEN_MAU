@@ -180,7 +180,7 @@ def get_donation_results():
         )
 
     page = max(int(request.args.get("page", 1)), 1)
-    per_page = 3
+    per_page = 5
     pag = query.order_by(Registration.thoi_gian_dang_ky.desc()).paginate(
         page=page, per_page=per_page, error_out=False
     )

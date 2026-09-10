@@ -72,7 +72,7 @@ function renderPagination(page, pages, total) {
   for (let number = 1; number <= pages; number += 1) {
     buttons.push(`<button class="btn btn-ghost btn-sm ${number === page ? "active" : ""}" data-page="${number}">${number}</button>`);
   }
-  return `<div class="pagination"><span class="hint">${total} dòng</span><div>
+  return `<div class="pagination"><div>
     <button class="btn btn-ghost btn-sm pagination-arrow" aria-label="Trang trước" title="Trang trước" data-page="${page - 1}" ${page === 1 ? "disabled" : ""}>&larr;</button>
     ${buttons.join("")}
     <button class="btn btn-ghost btn-sm pagination-arrow" aria-label="Trang sau" title="Trang sau" data-page="${page + 1}" ${page === pages ? "disabled" : ""}>&rarr;</button>
@@ -80,7 +80,7 @@ function renderPagination(page, pages, total) {
 }
 
 function paginateList(list, page) {
-  const perPage = 3;
+  const perPage = 5;
   const pages = Math.max(Math.ceil(list.length / perPage), 1);
   const currentPage = Math.min(Math.max(page, 1), pages);
   const start = (currentPage - 1) * perPage;
