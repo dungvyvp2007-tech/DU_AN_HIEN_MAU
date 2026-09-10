@@ -222,6 +222,9 @@ textarea { resize: vertical; min-height: 80px; }
 .btn-success { background: var(--success); color: #fff; }
 .btn-danger { background: var(--danger); color: #fff; }
 .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.83rem; }
+.pagination { display:flex; justify-content:space-between; align-items:center; gap:1rem; padding-top:1rem; }
+.pagination > div { display:flex; gap:0.35rem; flex-wrap:wrap; justify-content:flex-end; }
+.pagination .active { background:var(--crimson); color:#fff; }
 
 .form-footnote { margin-top: 1.4rem; font-size: 0.87rem; color: var(--muted); text-align: center; }
 

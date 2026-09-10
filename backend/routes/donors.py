@@ -71,7 +71,7 @@ def list_donors():
             db.or_(Donor.ma_nguoi_hien.ilike(like), Donor.ho_ten.ilike(like), Donor.so_cccd.ilike(like))
         )
     page = max(int(request.args.get("page", 1)), 1)
-    per_page = min(max(int(request.args.get("per_page", 20)), 1), 100)
+    per_page = 5
     pag = query.order_by(Donor.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
     return ok({
         "items": [d.to_dict() for d in pag.items],

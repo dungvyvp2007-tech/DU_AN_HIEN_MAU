@@ -36,6 +36,9 @@ def create_registration():
     if not latest_declaration:
         return fail("Bạn cần hoàn thành khai báo y tế trước khi đăng ký tham gia sự kiện.", 400)
 
+    if event.cap_nhat_trang_thai_theo_thoi_gian():
+        db.session.commit()
+
     if not event.dang_nhan_dang_ky():
         return fail("Sự kiện hiện không trong thời gian tiếp nhận đăng ký.", 400)
 
@@ -171,8 +174,15 @@ def get_donation_results():
             )
         )
 
-    regs = query.order_by(Registration.thoi_gian_dang_ky.desc()).all()
-    return ok([r.to_dict() for r in regs])
+    page = max(int(request.args.get("page", 1)), 1)
+    per_page = 5
+    pag = query.order_by(Registration.thoi_gian_dang_ky.desc()).paginate(
+        page=page, per_page=per_page, error_out=False
+    )
+    return ok({
+        "items": [r.to_dict() for r in pag.items],
+        "total": pag.total, "page": page, "per_page": per_page, "pages": pag.pages,
+    })
 
 
 @bp.put("/<string:ma_dang_ky>/result")

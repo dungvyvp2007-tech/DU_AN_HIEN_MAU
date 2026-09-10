@@ -344,10 +344,13 @@ async function loadReports() {
 }
 
 // ---------------------------------------------------------------- Người hiến
-async function loadDonors(q = "") {
+let donorPage = 1;
+
+async function loadDonors(q = "", page = donorPage) {
   const wrap = document.getElementById("donorTableWrap");
   try {
-    const res = await api(`/donors?q=${encodeURIComponent(q)}`);
+    donorPage = page;
+    const res = await api(`/donors?q=${encodeURIComponent(q)}&page=${page}`);
     wrap.innerHTML = res.items.length
       ? `<div class="card"><table><thead><tr>
           <th>Mã</th><th>Họ tên</th><th>Ngày sinh</th><th>Nhóm máu</th><th>SĐT</th><th>CCCD</th>
@@ -356,8 +359,11 @@ async function loadDonors(q = "") {
           <td>${d.ma_nguoi_hien}</td><td>${escapeHtml(d.ho_ten)}</td><td>${fmtDate(d.ngay_sinh)}</td>
           <td>${d.nhom_mau}</td><td>${d.so_dien_thoai}</td><td>${d.so_cccd}</td>
         </tr>`).join("")}
-        </tbody></table></div>`
+        </tbody></table>${renderPagination(res.page, res.pages, res.total)}</div>`
       : `<div class="empty-state">Không tìm thấy người hiến máu phù hợp.</div>`;
+    wrap.querySelectorAll("button[data-page]").forEach((button) => {
+      button.addEventListener("click", () => loadDonors(document.getElementById("donorSearch").value.trim(), Number(button.dataset.page)));
+    });
   } catch (err) {
     wrap.innerHTML = `<div class="empty-state">${escapeHtml(err.message)}</div>`;
   }
@@ -366,7 +372,7 @@ async function loadDonors(q = "") {
 let donorSearchTimer;
 document.getElementById("donorSearch").addEventListener("input", (e) => {
   clearTimeout(donorSearchTimer);
-  donorSearchTimer = setTimeout(() => loadDonors(e.target.value.trim()), 350);
+  donorSearchTimer = setTimeout(() => loadDonors(e.target.value.trim(), 1), 350);
 });
 
 loadAll();

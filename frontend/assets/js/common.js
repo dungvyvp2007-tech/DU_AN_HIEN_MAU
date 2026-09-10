@@ -66,6 +66,19 @@ function badge(status) {
   return `<span class="badge ${statusBadgeClass(status)}">${status}</span>`;
 }
 
+function renderPagination(page, pages, total) {
+  if (pages <= 1) return "";
+  const buttons = [];
+  for (let number = 1; number <= pages; number += 1) {
+    buttons.push(`<button class="btn btn-ghost btn-sm ${number === page ? "active" : ""}" data-page="${number}">${number}</button>`);
+  }
+  return `<div class="pagination"><span class="hint">${total} dòng</span><div>
+    <button class="btn btn-ghost btn-sm" data-page="${page - 1}" ${page === 1 ? "disabled" : ""}>Trước</button>
+    ${buttons.join("")}
+    <button class="btn btn-ghost btn-sm" data-page="${page + 1}" ${page === pages ? "disabled" : ""}>Sau</button>
+  </div></div>`;
+}
+
 function logout() {
   Session.clear();
   location.href = "index.html";
