@@ -36,6 +36,9 @@ def create_registration():
     if not latest_declaration:
         return fail("Bạn cần hoàn thành khai báo y tế trước khi đăng ký tham gia sự kiện.", 400)
 
+    if event.trang_thai in (Event.STATUS_DA_KET_THUC, Event.STATUS_DA_HUY):
+        return fail("Sự kiện đã kết thúc hoặc đã bị hủy, không thể đăng ký.", 400)
+
     if event.cap_nhat_trang_thai_theo_thoi_gian():
         db.session.commit()
 

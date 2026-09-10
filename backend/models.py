@@ -180,7 +180,7 @@ class Event(db.Model):
     def dang_nhan_dang_ky(self):
         now = datetime.utcnow()
         return (
-            self.trang_thai != Event.STATUS_DA_HUY
+            self.trang_thai not in (Event.STATUS_DA_KET_THUC, Event.STATUS_DA_HUY)
             and now <= self.thoi_gian_ket_thuc
         )
 
