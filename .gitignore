@@ -5,3 +5,4 @@ backend/*.db
 backend/venv/
 .DS_Store
 blood_donation.db
+config.py
