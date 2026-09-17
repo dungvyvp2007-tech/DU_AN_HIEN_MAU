@@ -25,6 +25,11 @@ class Config:
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    # --- Tài khoản quản trị viên khởi tạo sẵn ---
+    ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "admin")
+    ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "admin@hienmau.vn")
+    ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "Admin@123")
+
     # --- Quy tắc nghiệp vụ ---
     MIN_AGE_HIEN_MAU = 18
     MAX_AGE_HIEN_MAU = 60
