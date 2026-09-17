@@ -12,21 +12,23 @@ app = create_app()
 with app.app_context():
     db.create_all()
 
-    # --- Tài khoản admin (QTV) tạo sẵn ---
-    admin_username = app.config["ADMIN_USERNAME"]
-    admin = User.query.filter_by(username=admin_username).first()
-    if not admin:
-        admin = User(
-            username=admin_username,
-            email=app.config["ADMIN_EMAIL"],
-            role="QTV",
-        )
-        admin.set_password(app.config["ADMIN_PASSWORD"])
-        db.session.add(admin)
-        print(f"Đã tạo tài khoản quản trị viên: {admin_username} / {app.config['ADMIN_PASSWORD']}")
-    else:
-        print(f"Tài khoản quản trị viên '{admin_username}' đã tồn tại, bỏ qua.")
+# --- Tài khoản admin (QTV) tạo sẵn ---
+admin_username = app.config["ADMIN_USERNAME"]
+admin = User.query.filter_by(username=admin_username).first()
 
+if not admin:
+    admin = User(
+        username=admin_username,
+        email=app.config["ADMIN_EMAIL"],
+        role="QTV",
+    )
+    admin.set_password(app.config["ADMIN_PASSWORD"])
+    db.session.add(admin)
+    print(f"Đã tạo tài khoản quản trị viên mới: {admin_username}")
+else:
+    # Cập nhật lại mật khẩu mới từ biến môi trường nếu đã tồn tại
+    admin.set_password(app.config["ADMIN_PASSWORD"])
+    print(f"Đã cập nhật mật khẩu mới cho quản trị viên: {admin_username}")
     # --- Một tài khoản cán bộ y tế (CBYT) mẫu, để test luồng điểm danh ---
     staff_username = "canbo_yte1"
     staff = User.query.filter_by(username=staff_username).first()
